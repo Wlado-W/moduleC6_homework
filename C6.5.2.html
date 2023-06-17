@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Кнопка с выводом размеров экрана</title>
+</head>
+<body>
+  <button id="sizeButton">Получить размер экрана</button>
+
+  <script>
+    const sizeButton = document.getElementById('sizeButton');
+
+    function handleClick() {
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      const screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      const message = `Размер экрана: ${screenWidth} x ${screenHeight}`;
+      alert(message);
+    }
+
+    sizeButton.addEventListener('click', handleClick);
+  </script>
+</body>
+</html>
