@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Чат с эхо-сервером</title>
+</head>
+<body>
+  <div id="chatContainer"></div>
+  <input type="text" id="messageInput" placeholder="Введите сообщение">
+  <button id="sendButton">Отправить</button>
+  <button id="locationButton">Геолокация</button>
+
+  <script>
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const locationButton = document.getElementById('locationButton');
+    const serverUrl = 'wss://echo-ws-service.herokuapp.com';
+    let socket;
+
+    function addMessageToChat(message) {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = message;
+      chatContainer.appendChild(messageElement);
+    }
+
+    function sendMessage(message) {
+      socket.send(message);
+    }
+
+    function handleSendButtonClick() {
+      const message = messageInput.value;
+      addMessageToChat(message);
+      sendMessage(message);
+      messageInput.value = '';
+    }
+
+    function handleLocationButtonClick() {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const { latitude, longitude } = position.coords;
+          const locationUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}`;
+          const locationMessage = `<a href="${locationUrl}" target="_blank">Моя геолокация</a>`;
+          addMessageToChat(locationMessage);
+          sendMessage(locationUrl);
+        }, error => {
+          console.error('Ошибка получения геолокации:', error);
+        });
+      } else {
+        console.error('Геолокация не поддерживается');
+      }
+    }
+
+    function handleSocketMessage(event) {
+      const message = event.data;
+      addMessageToChat(message);
+    }
+
+    function initializeWebSocket() {
+      socket = new WebSocket(serverUrl);
+      socket.addEventListener('message', handleSocketMessage);
+    }
+
+    sendButton.addEventListener('click', handleSendButtonClick);
+    locationButton.addEventListener('click', handleLocationButtonClick);
+
+    initializeWebSocket();
+  </script>
+</body>
+</html>
